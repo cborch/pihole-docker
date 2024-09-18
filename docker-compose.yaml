@@ -8,17 +8,19 @@ services:
     # networks:
       # - dns
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
+      # - "53:53/tcp"
+      # - "53:53/udp"
       - "80:80/tcp"
     environment:
       TZ: 'America/New_York'
       WEBPASSWORD: ''
       DNS_FORWARD_MAX: 1000
+      DNS1: '127.0.0.1#5335'
+      DNS2: '::1#5335'
     # Volumes store your data between container upgrades
     volumes:
-      - './volume/etc-pihole:/etc/pihole'
-      - './volume/etc-dnsmasq.d:/etc/dnsmasq.d'
+      - 'pihole_data:/etc/pihole'
+      - 'dnsmasq_data:/etc/dnsmasq.d'
  
   unbound:
     container_name: unbound
@@ -35,6 +37,10 @@ services:
       - './unbound/volume:/opt/unbound/var/lib/unbound'
       - './unbound/volume2:/opt/unbound/etc/unbound'
     restart: unless-stopped
+
+volumes:
+  pihole_data:
+  dnsmasq_data:
 
 # networks:
   # dns:

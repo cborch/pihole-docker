@@ -1,0 +1,43 @@
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    # I can't get unbound to work unless it is in host network mode and then it
+    # only works with pihole if it is also in network mode.
+    network_mode: host
+    # networks:
+      # - dns
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+    environment:
+      TZ: 'America/New_York'
+      WEBPASSWORD: ''
+      DNS_FORWARD_MAX: 1000
+    # Volumes store your data between container upgrades
+    volumes:
+      - './volume/etc-pihole:/etc/pihole'
+      - './volume/etc-dnsmasq.d:/etc/dnsmasq.d'
+ 
+  unbound:
+    container_name: unbound
+    image: mvance/unbound-rpi:latest
+    # For some reason, I can only get it to work in host network mode.
+    network_mode: host
+    # networks:
+    # - dns
+    ports:
+      - "5335:53/tcp"
+      - "5335:53/udp"
+    volumes:
+      - './unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf'
+      - './unbound/volume:/opt/unbound/var/lib/unbound'
+      - './unbound/volume2:/opt/unbound/etc/unbound'
+    restart: unless-stopped
+
+# networks:
+  # dns:
+    # driver: bridge
+    # enable_ipv6: true
+
